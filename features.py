@@ -71,8 +71,6 @@ def fractionDigits(tokens):
     count = 0.0
     digits = 0.0
 
-    rd = {}
-
     for token in tokens:
         count += 1
         
@@ -82,19 +80,19 @@ def fractionDigits(tokens):
         if token.isdigit():
             digits += 1
 
-    rd['fractionDigits'] = int(PROMILLE * digits / count)
+	return {'fractionDigits':int(PROMILLE * digits / count)}
 
 
 # body of the email, not tokenized but parsed, no HTML
 # returns a dictionary of trigrams and their count of occurrences
 def trigrams(text):
     rd = {}
-    aux = collections.deque(maxlen=3)
+    aux = deque(maxlen=3)
     for char in text:
         aux.append(char)
         if len(aux) > 2:
             trigram = ''.join(aux)
-            if(trigram in rd):
+			if('trigram - '+trigram in rd):
                 rd['trigram - '+trigram] += 1
             else:
                 rd['trigram - '+trigram] = 1
