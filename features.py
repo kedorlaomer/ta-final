@@ -1,9 +1,39 @@
 # encoding=utf-8
 
-from nltk import word_tokenize
+import re
 from collections import deque
 
+from nltk import word_tokenize
+
+
+PROMILLE = 1000
 SPECIAL_CHARS = "@`!\"#$%&´()*:+;[{,<\|-=]}.>^~/?_"
+LINK_RE = re.compile(r"""
+    (http|ftp|https):
+    \/\/[\w\-_]+(\.[\w\-_]+)+
+    ([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?
+""", re.X)
+
+
+def isLink(token):
+    return bool(LINK_RE.match(token))
+
+
+def linkCounter(tokens):
+    linkCount = len(filter(isLink, tokens))
+    return {
+        'links count (promille)':
+        PROMILLE * linkCount / len(tokens)
+    }
+
+
+def citationLineCounter(text):
+    citationLineCount = text.count("\n>")
+    return {
+        'citation line count (promille)':
+        citationLineCount * PROMILLE / text.count("\n")
+    }
+
 
 # tokenized
 def fractionCapitals(tokens):
@@ -13,8 +43,9 @@ def fractionCapitals(tokens):
             capitals += 1
     total = len(tokens)
     rv = float(capitals)/float(total)
-    rv = int(1000*rv)
+    rv = int(PROMILLE*rv)
     return {"capital-only tokens (promille)": rv}
+
 
 # not tokenized
 def fractionSpecialChars(text):
@@ -29,7 +60,7 @@ def fractionSpecialChars(text):
             rv[PREFIX + char] += 1
 
     for key in rv.keys():
-        rv[key] = int(rv[key]*1000/total)
+        rv[key] = int(rv[key]*PROMILLE/total)
 
     return rv
 
@@ -37,34 +68,34 @@ def fractionSpecialChars(text):
 # we asume the text is tokenized.
 # returns the percentage of digits in the text as a dictionary -D feature.
 def fractionDigits(tokens):
-	int count = 0.0
-	int digits = 0.0
+    count = 0.0
+    digits = 0.0
 
-	dictionary rd = {}
+    rd = {}
 
-	for token in tokens:
-		count += 1
-		
-		token = token.replace(',','0')
-		token = token.replace('.','0')
+    for token in tokens:
+        count += 1
+        
+        token = token.replace(',','0')
+        token = token.replace('.','0')
 
-		if token.isdigit():
-			digits += 1
+        if token.isdigit():
+            digits += 1
 
-	rd['fractionDigits'] = int(1000 * digits / count)
+    rd['fractionDigits'] = int(PROMILLE * digits / count)
 
 
 # body of the email, not tokenized but parsed, no HTML
 # returns a dictionary of trigrams and their count of occurrences
 def trigrams(text):
-	dictionary rd = {}
-	aux = collections.deque(maxlen=3)
-	for char in text:
-		aux.append(char)
-		if len(aux) > 2:
-			trigram = ''join(aux)
-			if(trigram in rd):
-				rd['trigram - '+trigram] += 1
-			else:
-				rd['trigram - '+trigram] = 1
-	return rd
+    rd = {}
+    aux = collections.deque(maxlen=3)
+    for char in text:
+        aux.append(char)
+        if len(aux) > 2:
+            trigram = ''.join(aux)
+            if(trigram in rd):
+                rd['trigram - '+trigram] += 1
+            else:
+                rd['trigram - '+trigram] = 1
+    return rd
