@@ -1,0 +1,32 @@
+Fahrplan
+====
+
+
+Welche Header sind interessant? (siehe email.parser)
+
+From (auch Inhalt)
+Reply-To (Inhalt unwichtig)
+In-Reply-To (Inhalt unwichtig)
+Subject (genau angucken!)
+Content-Type: hat html, octet-stream, image…
+CC
+existiert Signaturen:
+
+Welche Statitistiken sind interessant?
+Anzahl  
+
+      * Zeilen                  
+      * Wörter                              [x]
+      * Trigramme                           [x]
+                                            
+(diskretisieren)                            
+Anteil  
+
+      * Großbuchstaben                      [x]
+      * Ziffern                             [x]
+      * zitierte Zeilen
+      * @`!"#$%&´()*:+;[{,<\|-=]}.>^~/?_    [x]
+      * Links (selbst implementieren?)
+      * Stopwords (?)
+
+[x]: für Subject-Zeile gesondert berechnen
