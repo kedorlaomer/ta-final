@@ -15,7 +15,6 @@ existiert Signaturen:
 Welche Statitistiken sind interessant?
 Anzahl  
 
-      * Zeilen                  
       * Wörter                              [x]
       * Trigramme                           [x]
                                             
@@ -30,3 +29,8 @@ Anteil
       * Stopwords (?)
 
 [x]: für Subject-Zeile gesondert berechnen
+
+Falls HTML:
+      * Farben?  
+      * bold?
+      * italic, underlined, …?
