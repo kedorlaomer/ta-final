@@ -1,11 +1,40 @@
 # encoding=utf-8
 
-from nltk import word_tokenize
+import re
 from collections import deque
 import email.parser
 
+from nltk import word_tokenize
+
+
+PROMILLE = 1000
 SPECIAL_CHARS = "@`!\"#$%&´()*:+;[{,<\|-=]}.>^~/?_"
 MAIL_PARSER = email.parser.Parser()
+LINK_RE = re.compile(r"""
+    (http|ftp|https|mailto):
+    \/\/[\w\-_]+(\.[\w\-_]+)+
+    ([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?
+""", re.X)
+
+
+def isLink(token):
+    return bool(LINK_RE.match(token))
+
+
+def linkCounter(tokens):
+    linkCount = len(filter(isLink, tokens))
+    return {
+        'links count (promille)':
+        PROMILLE * linkCount / len(tokens)
+    }
+
+
+def citationLineCounter(text):
+    citationLineCount = text.count("\n>")
+    return {
+        'citation line count (promille)':
+        citationLineCount * PROMILLE / text.count("\n")
+    }
 
 # tokenized
 def fractionCapitals(tokens):
@@ -15,8 +44,9 @@ def fractionCapitals(tokens):
             capitals += 1
     total = len(tokens)
     rv = float(capitals)/float(total)
-    rv = int(1000*rv)
-    return {"capital-only tokens (promille) ": rv}
+    rv = int(PROMILLE*rv)
+    return {"capital-only tokens (promille)": rv}
+
 
 # not tokenized
 def fractionSpecialChars(text):
@@ -31,7 +61,7 @@ def fractionSpecialChars(text):
             rv[PREFIX + char] += 1
 
     for key in rv.keys():
-        rv[key] = int(rv[key]*1000/total)
+        rv[key] = int(rv[key]*PROMILLE/total)
 
     return rv
 
@@ -39,19 +69,19 @@ def fractionSpecialChars(text):
 # we asume the text is tokenized.
 # returns the percentage of digits in the text as a dictionary -D feature.
 def fractionDigits(tokens):
-	count = 0.0
-	digits = 0.0
+    count = 0.0
+    digits = 0.0
 
-	for token in tokens:
-		count += 1
-		
-		token = token.replace(',','0')
-		token = token.replace('.','0')
+    for token in tokens:
+        count += 1
+        
+        token = token.replace(',','0')
+        token = token.replace('.','0')
 
-		if token.isdigit():
-			digits += 1
+        if token.isdigit():
+            digits += 1
 
-	return {'fractionDigits':int(1000 * digits / count)}
+	return {'fractionDigits':int(PROMILLE * digits / count)}
 
 
 # body of the email, not tokenized but parsed, no HTML
@@ -74,8 +104,8 @@ def addToDict(old, new):
     for (key, value) in new.items():
         old[key] = value
 
-TOKEN_FUNCTIONS = [fractionCapitals, fractionDigits]
-TEXT_FUNCTIONS  = [fractionSpecialChars, trigrams]
+TOKEN_FUNCTIONS = [fractionCapitals, fractionDigits, linkCounter]
+TEXT_FUNCTIONS  = [fractionSpecialChars, trigrams, citationLineCounter]
 HTML_FUNCTIONS  = []
 STOP_WORDS      = set() # read it later
 
