@@ -33,7 +33,7 @@ def citationLineCounter(text):
     citationLineCount = text.count("\n>")
     return {
         'citation line count (promille)':
-        citationLineCount * PROMILLE / text.count("\n")
+        citationLineCount * PROMILLE / (text.count("\n") or 1)
     }
 
 # tokenized
