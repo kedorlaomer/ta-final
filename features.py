@@ -93,10 +93,7 @@ def trigrams(text):
 		aux.append(char)
 		if len(aux) > 2:
 			trigram = ''.join(aux)
-			if('trigram - '+trigram in rd):
-				rd['trigram - '+trigram] += 1
-			else:
-				rd['trigram - '+trigram] = 1
+            rd['trigram - '+trigram] = 1
 	return rd
 
 # adds (overwriting) all keys from new to old
