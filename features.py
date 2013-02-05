@@ -7,7 +7,7 @@ import email.parser
 from nltk import word_tokenize
 
 
-PROMILLE = 1000
+PROMILLE = 10
 SPECIAL_CHARS = "@`!\"#$%&´()*:+;[{,<\|-=]}.>^~/?_"
 MAIL_PARSER = email.parser.Parser()
 LINK_RE = re.compile(r"""
@@ -24,7 +24,7 @@ def isLink(token):
 def linkCounter(tokens):
     linkCount = len(filter(isLink, tokens))
     return {
-        'links count (promille)':
+        'links count (prodec)':
         PROMILLE * linkCount / len(tokens)
     }
 
@@ -32,7 +32,7 @@ def linkCounter(tokens):
 def citationLineCounter(text):
     citationLineCount = text.count("\n>")
     return {
-        'citation line count (promille)':
+        'citation line count (prodec)':
         citationLineCount * PROMILLE / (text.count("\n") or 1)
     }
 
@@ -45,23 +45,20 @@ def fractionCapitals(tokens):
     total = len(tokens)
     rv = float(capitals)/float(total)
     rv = int(PROMILLE*rv)
-    return {"capital-only tokens (promille)": rv}
+    return {"capital-only tokens (prodec)": rv}
 
 
 # not tokenized
 def fractionSpecialChars(text):
     rv = {}
     total = len(text)
-    PREFIX = "special char (promille) "
+    PREFIX = "special char "
     for char in SPECIAL_CHARS:
         rv[PREFIX + char] = 0
 
     for char in text:
         if char in SPECIAL_CHARS:
-            rv[PREFIX + char] += 1
-
-    for key in rv.keys():
-        rv[key] = int(rv[key]*PROMILLE/total)
+            rv[PREFIX + char] = 1
 
     return rv
 
@@ -81,20 +78,20 @@ def fractionDigits(tokens):
         if token.isdigit():
             digits += 1
 
-	return {'fractionDigits':int(PROMILLE * digits / count)}
+    return {'fractionDigits':int(PROMILLE * digits / count)}
 
 
 # body of the email, not tokenized but parsed, no HTML
 # returns a dictionary of trigrams and their count of occurrences
 def trigrams(text):
-	rd = {}
-	aux = deque(maxlen=3)
-	for char in text.lower():
-		aux.append(char)
-		if len(aux) > 2:
-			trigram = ''.join(aux)
+    rd = {}
+    aux = deque(maxlen=3)
+    for char in text.lower():
+        aux.append(char)
+        if len(aux) > 2:
+            trigram = ''.join(aux)
             rd['trigram - '+trigram] = 1
-	return rd
+    return rd
 
 # adds (overwriting) all keys from new to old
 def addToDict(old, new):
