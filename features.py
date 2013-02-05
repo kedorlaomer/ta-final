@@ -104,9 +104,11 @@ def addToDict(old, new):
     for (key, value) in new.items():
         old[key] = value
 
+# functions working on specific parts/formats of a message
 TOKEN_FUNCTIONS = [fractionCapitals, fractionDigits, linkCounter]
-TEXT_FUNCTIONS  = [fractionSpecialChars, trigrams, citationLineCounter]
+TEXT_FUNCTIONS  = [fractionSpecialChars, trigrams]
 HTML_FUNCTIONS  = []
+UNPARSED_FUNCTIONS = [citationLineCounter]
 STOP_WORDS      = set() # read it later
 
 with open("english_stop_words.txt") as f:
@@ -116,6 +118,9 @@ with open("english_stop_words.txt") as f:
 
 STOP_WORDS = frozenset(STOP_WORDS)
 
+def isHTML(text):
+    return "<html>" in text.lower()
+
 def featuresForMail(path):
     p = MAIL_PARSER
     rv = {}
@@ -124,15 +129,18 @@ def featuresForMail(path):
 
 # text of the email
         fullText = ""
+        unparsedText = ""
         for part in mail.walk():
             if not part.is_multipart(): # TODO: handle HTML
                 fullText += "\n" + part.get_payload(decode=True)
+                unparsedText += "\n" + part.get_payload(decode=False)
 
         tokens = word_tokenize(fullText)
 
 # remove stop words
         tokens = filter(lambda token: token not in STOP_WORDS, tokens)
         fullText = " ".join(tokens)
+        print "**** unparsedText = " + unparsedText
 
         for function in TEXT_FUNCTIONS:
             data = function(fullText)
@@ -140,6 +148,10 @@ def featuresForMail(path):
 
         for function in TOKEN_FUNCTIONS:
             data = function(tokens)
+            addToDict(rv, data)
+
+        for function in UNPARSED_FUNCTIONS:
+            data = function(unparsedText)
             addToDict(rv, data)
 
         return rv
