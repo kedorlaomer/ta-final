@@ -1,6 +1,7 @@
 # encoding=utf-8
 
-import os
+from os import listdir
+from random import random
 
 
 def getDirContent(dirpath):
@@ -8,7 +9,7 @@ def getDirContent(dirpath):
     content = []
 
     try:
-        directoryListing = os.listdir(dirpath)
+        directoryListing = listdir(dirpath)
         for filepath in directoryListing:
             with open("%s/%s" % (dirpath, filepath), 'r') as f:
                 content.append(f.read())
@@ -24,3 +25,13 @@ def getHamContent():
 
 def getSpamContent():
     return getDirContent('trainingspam')
+
+
+def splitByRatio(texts, ratio):
+
+    a = []
+    b = []
+
+    for text in texts:
+        (b if random() > ratio else a).append(text)
+    return a, b
