@@ -140,7 +140,6 @@ def featuresForMail(path):
 # remove stop words
         tokens = filter(lambda token: token not in STOP_WORDS, tokens)
         fullText = " ".join(tokens)
-        print "**** unparsedText = " + unparsedText
 
         for function in TEXT_FUNCTIONS:
             data = function(fullText)
