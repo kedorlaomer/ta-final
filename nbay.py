@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-# use maximum entropy classifier for learning spam/ham
+# use naïve bayes classifier for learning spam/ham
 
 import os
 from features import featuresForMail
-from nltk.classify import MaxentClassifier
+from nltk.classify import NaiveBayesClassifier
 
 def listdir_fullpath(d):
     return [os.path.join(d, f) for f in os.listdir(d)]
@@ -22,5 +22,5 @@ def trainMaxEnt(spamdir, hamdir):
         classifications += [False]
 
     features = zip(allFeatures, classifications)
-    classi = MaxentClassifier.train(features)
+    classi = NaiveBayesClassifier.train(features)
     return classi
