@@ -135,49 +135,52 @@ def toUni(string):
         return unicode(string, "latin-1", "ignore")
     return string
 
+
 def featuresForMail(path):
     p = MAIL_PARSER
     rv = {}
     with codecs.open(path, 'r', encoding='latin-1') as f:
         mail = p.parse(f)
+    return featuresForText(mail)
 
+def featuresForText(mail):
 # text of the email
-        fullText = u""
-        unparsedText = u""
-        html = u""
-        for part in mail.walk():
-            if not part.is_multipart():
-                try:
-                    fullText += u"\n" + toUni(part.get_payload(decode=True))
-                    unparsedText += u"\n" + toUni(part.get_payload(decode=False))
-                except UnicodeError:
-                    pass
+    fullText = u""
+    unparsedText = u""
+    html = u""
+    for part in mail.walk():
+        if not part.is_multipart():
+            try:
+                fullText += u"\n" + toUni(part.get_payload(decode=True))
+                unparsedText += u"\n" + toUni(part.get_payload(decode=False))
+            except UnicodeError:
+                pass
 
-                if isHTML(fullText):
-                    html = fullText
-                    fullText = htmlText(fullText)
-                    unparsedText = htmlText(unparsedText)
+            if isHTML(fullText):
+                html = fullText
+                fullText = htmlText(fullText)
+                unparsedText = htmlText(unparsedText)
+    rv = {}
+    tokens = word_tokenize(fullText)
 
-        tokens = word_tokenize(fullText)
+    # remove stop words
+    tokens = filter(lambda token: token not in STOP_WORDS, tokens)
+    fullText = " ".join(tokens)
 
-# remove stop words
-        tokens = filter(lambda token: token not in STOP_WORDS, tokens)
-        fullText = " ".join(tokens)
+    for function in TEXT_FUNCTIONS:
+        data = function(fullText)
+        addToDict(rv, data)
 
-        for function in TEXT_FUNCTIONS:
-            data = function(fullText)
-            addToDict(rv, data)
+    for function in HTML_FUNCTIONS:
+        data = function(html)
+        addToDict(rv, data)
 
-        for function in TOKEN_FUNCTIONS:
-            data = function(tokens)
-            addToDict(rv, data)
+    for function in TOKEN_FUNCTIONS:
+        data = function(tokens)
+        addToDict(rv, data)
 
-        for function in UNPARSED_FUNCTIONS:
-            data = function(unparsedText)
-            addToDict(rv, data)
+    for function in UNPARSED_FUNCTIONS:
+        data = function(unparsedText)
+        addToDict(rv, data)
 
-        for function in HTML_FUNCTIONS:
-            data = function(html)
-            addToDict(rv, data)
-
-        return rv
+    return rv
