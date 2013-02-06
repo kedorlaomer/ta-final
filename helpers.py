@@ -3,6 +3,8 @@
 from os import listdir
 from random import random
 
+from features import MAIL_PARSER as mp
+
 
 def getDirContent(dirpath):
 
@@ -12,7 +14,7 @@ def getDirContent(dirpath):
         directoryListing = listdir(dirpath)
         for filepath in directoryListing:
             with open("%s/%s" % (dirpath, filepath), 'r') as f:
-                content.append(f.read())
+                content.append(mp.parse(f))
     except Exception as ex:
         print 'Error occured while reading directory:', ex
 

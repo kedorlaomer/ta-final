@@ -4,20 +4,20 @@ from nltk import NaiveBayesClassifier
 from nltk import classify as nltk_classify
 
 from features import featuresForText
-from helpers import splitByRatio, getHamContent
+from helpers import splitByRatio, getHamContent, getSpamContent
 
 
 def getBayesAccuracy():
 
-    classifier = NaiveBayesClassifier()
-    content = getHamContent()
     featureset = []
 
-    for text in content:
-        featureset.append(featuresForText(text))
+    for text in getHamContent():
+        featureset.append((featuresForText(text), False))
+    for text in getSpamContent():
+        featureset.append((featuresForText(text), True))
     trainset, devset = splitByRatio(featureset, 0.9)
-    classifier.train(trainset)
 
+    classifier = NaiveBayesClassifier.train(trainset)
     return nltk_classify.accuracy(classifier, devset)
 
 

@@ -115,36 +115,42 @@ STOP_WORDS = frozenset(STOP_WORDS)
 def isHTML(text):
     return "<html>" in text.lower()
 
+
 def featuresForMail(path):
     p = MAIL_PARSER
-    rv = {}
     with open(path) as f:
         mail = p.parse(f)
+    return featuresForText(mail)
 
-# text of the email
-        fullText = ""
-        unparsedText = ""
-        for part in mail.walk():
-            if not part.is_multipart(): # TODO: handle HTML
-                fullText += "\n" + part.get_payload(decode=True)
-                unparsedText += "\n" + part.get_payload(decode=False)
 
-        tokens = word_tokenize(fullText)
+def featuresForText(mail):
 
-# remove stop words
-        tokens = filter(lambda token: token not in STOP_WORDS, tokens)
-        fullText = " ".join(tokens)
+    rv = {}
 
-        for function in TEXT_FUNCTIONS:
-            data = function(fullText)
-            addToDict(rv, data)
+    # text of the email
+    fullText = ""
+    unparsedText = ""
+    for part in mail.walk():
+        if not part.is_multipart():  # TODO: handle HTML
+            fullText += "\n" + part.get_payload(decode=True)
+            unparsedText += "\n" + part.get_payload(decode=False)
 
-        for function in TOKEN_FUNCTIONS:
-            data = function(tokens)
-            addToDict(rv, data)
+    tokens = word_tokenize(fullText)
 
-        for function in UNPARSED_FUNCTIONS:
-            data = function(unparsedText)
-            addToDict(rv, data)
+    # remove stop words
+    tokens = filter(lambda token: token not in STOP_WORDS, tokens)
+    fullText = " ".join(tokens)
 
-        return rv
+    for function in TEXT_FUNCTIONS:
+        data = function(fullText)
+        addToDict(rv, data)
+
+    for function in TOKEN_FUNCTIONS:
+        data = function(tokens)
+        addToDict(rv, data)
+
+    for function in UNPARSED_FUNCTIONS:
+        data = function(unparsedText)
+        addToDict(rv, data)
+
+    return rv
