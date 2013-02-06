@@ -1,6 +1,7 @@
 # encoding=utf-8
 
 from os import listdir
+import os
 from random import random
 
 
@@ -25,6 +26,9 @@ def getHamContent():
 
 def getSpamContent():
     return getDirContent('trainingspam')
+
+def listdir_fullpath(d):
+    return [os.path.join(d, f) for f in os.listdir(d)]
 
 
 def splitByRatio(texts, ratio):
