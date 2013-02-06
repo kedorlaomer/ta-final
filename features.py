@@ -5,11 +5,13 @@ from collections import deque
 import email.parser
 
 from nltk import word_tokenize
+from htmlParser import MyHTMLParser
 
 
 PROMILLE = 10
 SPECIAL_CHARS = "@`!\"#$%&´()*:+;[{,<\|-=]}.>^~/?_"
 MAIL_PARSER = email.parser.Parser()
+HTML_PARSER = MyHTMLParser()
 LINK_RE = re.compile(r"""
     (http|ftp|https|mailto):
     \/\/[\w\-_]+(\.[\w\-_]+)+
@@ -98,10 +100,25 @@ def addToDict(old, new):
     for (key, value) in new.items():
         old[key] = value
 
+def isHTML(text):
+    return "<html>" in text.lower()
+
+# returns title, followed by \n, followed by body of given html
+def htmlText(html):
+    HTML_PARSER.reset()
+    HTML_PARSER.feed(html)
+    return HTML_PARSER.title.strip() + "\n" + HTML_PARSER.body.strip()
+
+def htmlFeatures(html):
+    rv = {"is html ": 1}
+    rv["colored parts "] = min(2, HTML_PARSER.colorCount)
+    rv["font'ed parts "] = min(2, HTML_PARSER.fontCount)
+    return rv
+
 # functions working on specific parts/formats of a message
 TOKEN_FUNCTIONS = [fractionCapitals, fractionDigits, linkCounter]
 TEXT_FUNCTIONS  = [fractionSpecialChars, trigrams]
-HTML_FUNCTIONS  = []
+HTML_FUNCTIONS  = [htmlFeatures]
 UNPARSED_FUNCTIONS = [citationLineCounter]
 STOP_WORDS      = set() # read it later
 
@@ -111,9 +128,6 @@ with open("english_stop_words.txt") as f:
         STOP_WORDS.add(word)
 
 STOP_WORDS = frozenset(STOP_WORDS)
-
-def isHTML(text):
-    return "<html>" in text.lower()
 
 def featuresForMail(path):
     p = MAIL_PARSER
@@ -125,9 +139,12 @@ def featuresForMail(path):
         fullText = ""
         unparsedText = ""
         for part in mail.walk():
-            if not part.is_multipart(): # TODO: handle HTML
+            if not part.is_multipart():
                 fullText += "\n" + part.get_payload(decode=True)
                 unparsedText += "\n" + part.get_payload(decode=False)
+                if isHTML(fullText):
+                    fullText = htmlText(fullText)
+                    unparsedText = htmlText(unparsedText)
 
         tokens = word_tokenize(fullText)
 
