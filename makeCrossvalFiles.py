@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from sys import argv
 from glob import glob
 from random import shuffle
@@ -49,4 +51,5 @@ if __name__ == '__main__':
 		spam = glob(argv[2]+'*')
 		mergeLists(makeCrossValidationGroups(ham),makeCrossValidationGroups(spam),argv[3])
 	else:
+
 		print "path to the files is needed"

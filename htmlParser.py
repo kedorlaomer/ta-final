@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from HTMLParser import HTMLParser
 
 # create a subclass and override the handler methods

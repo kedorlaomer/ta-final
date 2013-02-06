@@ -2,6 +2,7 @@ mkdir "crossval"
 cd "crossval"
 for i in {0..9}
 do
+    echo -n "."
     mkdir "train$i"
     cd "train$i"
     mkdir "ham"
@@ -14,4 +15,5 @@ do
     cd ".."
 done
 cd ".."
+echo ""
 python "crossvalidation.py" "trainingham/" "trainingspam/" "crossval/"

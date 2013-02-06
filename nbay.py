@@ -4,10 +4,8 @@
 
 import os
 from features import featuresForMail
+from helpers import listdir_fullpath
 from nltk.classify import NaiveBayesClassifier
-
-def listdir_fullpath(d):
-    return [os.path.join(d, f) for f in os.listdir(d)]
 
 def trainNaiveBayes(spamdir, hamdir):
     allFeatures = []
