@@ -1,10 +1,11 @@
 # encoding=utf-8
 
 import re
-from collections import deque
 import email.parser
-import codecs
+from collections import deque
+
 from nltk import word_tokenize
+
 from htmlParser import MyHTMLParser
 
 
@@ -38,6 +39,7 @@ def citationLineCounter(text):
         citationLineCount * PROMILLE / (text.count("\n") or 1)
     }
 
+
 # tokenized
 def fractionCapitals(tokens):
     capitals = 0
@@ -45,8 +47,8 @@ def fractionCapitals(tokens):
         if token.isupper():
             capitals += 1
     total = len(tokens)
-    rv = float(capitals)/(float(total) or 1)
-    rv = int(PROMILLE*rv)
+    rv = float(capitals) / (float(total) or 1)
+    rv = int(PROMILLE * rv)
     return {"capital-only tokens (prodec)": rv}
 
 
@@ -73,9 +75,9 @@ def fractionDigits(tokens):
 
     for token in tokens:
         count += 1
-        
-        token = token.replace(',','0')
-        token = token.replace('.','0')
+
+        token = token.replace(',', '0')
+        token = token.replace('.', '0')
 
         if token.isdigit():
             digits += 1
@@ -135,12 +137,13 @@ def toUni(string):
         return unicode(string, "latin-1", "ignore")
     return string
 
+
 def featuresForMail(path):
     p = MAIL_PARSER
-    rv = {}
     with open(path) as f:
         mail = p.parse(f)
     return featuresForText(mail)
+
 
 def headerFeatures(mail):
     rv = {}
@@ -153,6 +156,7 @@ def headerFeatures(mail):
         rv["has content-type"] = contentType if index == -1 else contentType[:index]
 
     return rv
+
 
 # text is the subject line of a mail
 def subjectFeatures(text):
@@ -171,6 +175,7 @@ def subjectFeatures(text):
         rv["in subject " + key] = value
 
     return rv
+
 
 def featuresForText(mail):
 # text of the email
