@@ -149,8 +149,13 @@ def headerFeatures(mail):
     rv = {}
     rv["has reply-to"] = "Reply-To" in mail
     rv["has in-reply-to"] = "In-Reply-To" in mail
-    contentType = mail["Content-Type"]
 
+    if "To" in mail and not mail["To"]:
+        rv["to-empty"] = True
+    if "X-Keywords" in mail and not mail["X-Keywords"]:
+        rv["x-keywords-empty"] = True
+
+    contentType = mail["Content-Type"]
     if contentType is not None:
         index = contentType.find(";")
         rv["has content-type"] = contentType if index == -1 else contentType[:index]
