@@ -28,9 +28,11 @@ def getBayesAccuracy(splitRatio=0.9):
     for text in getHamContent():
         featureset.append((featuresForText(text), NOSPAM))
 
+    shuffle(featureset)
     trainset, devset = splitByRatio(featureset, splitRatio)
 
     classifier = NaiveBayesClassifier.train(trainset)
+    print classifier.show_most_informative_features(10)
     return nltk_classify.accuracy(classifier, devset)
 
 
@@ -43,16 +45,9 @@ def train(spamDir, hamDir):
     for text in getDirContent(hamDir):
         featureset.append((featuresForText(text), NOSPAM))
 
-    dt1 = datetime.now()
     shuffle(featureset)
-    dt2 = datetime.now()
     classifier = NaiveBayesClassifier.train(featureset)
-    dt3 = datetime.now()
     saveClassifier(classifier, CLASSIFIER_PATH)
-    dt4 = datetime.now()
-    print dt2 - dt1
-    print dt3 - dt2
-    print dt4 - dt3
 
     print "Done with learning."
 
@@ -62,6 +57,7 @@ def classify(evalDir, resultFilename):
     classifier = loadClassifier(CLASSIFIER_PATH)
     if not classifier:
         raise Exception("Classifier was not loaded.")
+    print "loaded"
 
     with open(resultFilename, "w") as f:
 
@@ -96,6 +92,9 @@ if __name__ == '__main__':
 
     elif args[0] == 'classify':
         classify(*args[1:])
+
+    elif args[0] == 'geba':
+        print getBayesAccuracy()
 
     else:
         printUsage()

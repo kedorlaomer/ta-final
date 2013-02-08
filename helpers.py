@@ -37,7 +37,7 @@ def getSpamContent():
 
 def saveClassifier(classifier, filename):
 
-    with open(filename, 'wb') as f:
+    with open(filename, 'w') as f:
         cPickle.dump(classifier, f)
     print "Classifier was successfully dumped to the file '%s'." % (
         filename)

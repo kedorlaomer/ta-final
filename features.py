@@ -38,6 +38,7 @@ def citationLineCounter(text):
         citationLineCount * PROMILLE / (text.count("\n") or 1)
     }
 
+
 # tokenized
 def fractionCapitals(tokens):
     capitals = 0
@@ -45,8 +46,8 @@ def fractionCapitals(tokens):
         if token.isupper():
             capitals += 1
     total = len(tokens)
-    rv = float(capitals)/(float(total) or 1)
-    rv = int(PROMILLE*rv)
+    rv = float(capitals) / (float(total) or 1)
+    rv = int(PROMILLE * rv)
     return {"capital-only tokens (prodec)": rv}
 
 
@@ -109,6 +110,7 @@ def htmlText(html):
     HTML_PARSER.feed(html)
     return HTML_PARSER.title.strip() + "\n" + HTML_PARSER.body.strip()
 
+
 def htmlFeatures(html):
     rv = {"is html ": 1}
     rv["colored parts "] = min(2, HTML_PARSER.colorCount)
@@ -138,10 +140,10 @@ def toUni(string):
 
 def featuresForMail(path):
     p = MAIL_PARSER
-    rv = {}
     with codecs.open(path, 'r', encoding='latin-1') as f:
         mail = p.parse(f)
     return featuresForText(mail)
+
 
 def featuresForText(mail):
 # text of the email
