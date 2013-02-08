@@ -44,7 +44,6 @@ def mergeLists(ham, spam, where):
             copy(x, "%strain%s/spam/%s" % (where, i, x.split('/')[1]))
         testSpam = spam[i][1]
         for x in testSpam:
-            # TODO: ask Alfonso
             copy(x, "%stest%s/spam/%s" % (where, i, x.split('/')[1]))
 
 
@@ -52,8 +51,6 @@ if __name__ == '__main__':
     if len(argv) > 2:
         ham = glob(argv[1] + '*')
         spam = glob(argv[2] + '*')
-        print ham
-        print spam
         mergeLists(
             makeCrossValidationGroups(ham),
             makeCrossValidationGroups(spam),

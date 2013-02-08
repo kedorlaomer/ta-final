@@ -2,7 +2,6 @@
 
 import sys
 from random import shuffle
-from datetime import datetime
 
 from nltk import NaiveBayesClassifier
 from nltk import classify as nltk_classify

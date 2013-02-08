@@ -61,7 +61,6 @@ def splitByRatio(texts, ratio):
 
     a = []
     b = []
-
     for text in texts:
         (b if random() > ratio else a).append(text)
     return a, b
