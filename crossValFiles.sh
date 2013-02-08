@@ -1,3 +1,4 @@
+#!/bin/bash
 mkdir "crossval"
 cd "crossval"
 for i in {0..9}
@@ -16,4 +17,4 @@ do
 done
 cd ".."
 echo ""
-python "crossvalidation.py" "trainingham/" "trainingspam/" "crossval/"
+python "makeCrossvalFiles.py" "trainingham/" "trainingspam/" "crossval/"
